@@ -1,4 +1,4 @@
-module github.com/euiko/hello-nats
+module github.com/euiko/hello-nats-subs
 
 go 1.13
 
