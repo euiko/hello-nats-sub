@@ -67,6 +67,7 @@ func handle(msg *stan.Msg) {
 }
 
 func main() {
+	logger("Starting hello-nats-sub...")
 	config := getConfig()
 	opts := []stan.Option{}
 	if config.NatsURL != "" {
@@ -82,6 +83,7 @@ func main() {
 		os.Exit(2)
 	}
 
+	logger("Connecting...")
 	conn, err := stan.Connect(config.StanClusterID, config.StanClientID, opts...)
 	if err != nil {
 		log.Print(err)
@@ -89,6 +91,7 @@ func main() {
 	}
 	defer logCloser(conn)
 
+	logger("Subscribing...")
 	conn.Subscribe(
 		"demo",
 		handle,
@@ -113,8 +116,8 @@ func healthz(w http.ResponseWriter, req *http.Request) {
 	if config.NatsURL != "" {
 		opts = append(opts, stan.NatsURL(config.NatsURL))
 	}
-
-	conn, err := stan.Connect(config.StanClusterID, config.StanClientID, opts...)
+	offset := fmt.Sprintf("%v", time.Now().Unix())
+	conn, err := stan.Connect(config.StanClusterID, config.StanClientID+offset, opts...)
 	if err != nil {
 		http.Error(w, "I'm not live", 503)
 		logger(fmt.Sprintf("Error on healthz check failed: %s", err))
