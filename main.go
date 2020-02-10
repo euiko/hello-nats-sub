@@ -98,7 +98,7 @@ func main() {
 	)
 
 	r := mux.NewRouter()
-	r.HandleFunc("/healthz", healtz)
+	r.HandleFunc("/healthz", healthz)
 	r.HandleFunc("/ready", ready)
 	r.HandleFunc("/metrics", metrics)
 
@@ -107,8 +107,26 @@ func main() {
 	os.Exit(0)
 }
 
-func healtz(w http.ResponseWriter, req *http.Request) {
-	http.Error(w, "I'm not live", 503)
+func healthz(w http.ResponseWriter, req *http.Request) {
+	config := getConfig()
+	opts := []stan.Option{}
+	if config.NatsURL != "" {
+		opts = append(opts, stan.NatsURL(config.NatsURL))
+	}
+
+	conn, err := stan.Connect(config.StanClusterID, config.StanClientID, opts...)
+	if err != nil {
+		http.Error(w, "I'm not live", 503)
+		logger(fmt.Sprintf("Error on healthz check failed: %s", err))
+		return
+	}
+	if err := conn.Close(); err != nil {
+		http.Error(w, "I'm not live", 503)
+		logger(fmt.Sprintf("Error on healthz check failed: %s", err))
+		return
+	}
+
+	fmt.Fprint(w, "Yey I'm healthy")
 }
 
 func ready(w http.ResponseWriter, req *http.Request) {
