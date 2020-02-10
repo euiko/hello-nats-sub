@@ -17,3 +17,8 @@ steps:
     registry: docker-registry.mlg-dev.local
     auto_tag: true
     insecure: true
+trigger:
+  ref:
+  - refs/heads/master
+  - "refs/tags/**"
+  - "refs/pull/**"
