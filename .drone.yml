@@ -1,0 +1,19 @@
+---
+kind: pipeline
+type: kubernetes
+name: hello-nats-sub
+
+steps:
+- name: build and test
+  image: golang:1.13-alpine
+  commands:
+  - go mod download
+  - go build
+  # - go test
+- name: push image
+  image: plugins/docker
+  settings:
+    repo: docker-registry.mlg-dev.local/euiko/hello-nats-sub
+    registry: docker-registry.mlg-dev.local
+    auto_tag: true
+    insecure: true
