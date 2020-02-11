@@ -13,7 +13,7 @@ steps:
 - name: push image
   image: plugins/docker
   environment:
-    PLUGIN_MTU: 1440
+    PLUGIN_MTU: 1376
   settings:
     repo: docker-registry.mlg-dev.local/euiko/hello-nats-sub
     registry: docker-registry.mlg-dev.local
