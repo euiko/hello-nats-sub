@@ -53,17 +53,23 @@ func logger(message string) {
 func process(msg *stan.Msg) error {
 	logger(fmt.Sprintf("Received subject: %s", msg.Subject))
 	logger(fmt.Sprintf("Received message: %s", msg.String()))
-	logger("Very long processing")
-	defer logger("You've done a long long time")
-	time.Sleep(30 * time.Second)
+	logger("Very long processing...")
+	defer logger("You've done a long long time process")
+	time.Sleep(15 * time.Second)
 	return nil
 }
 
 func handle(msg *stan.Msg) {
-	err := process(msg)
-	if err == nil {
-		msg.Ack()
+
+	if err := process(msg); err != nil {
+		logger("Proccessing message failed")
+		return
 	}
+
+	if err := msg.Ack(); err != nil {
+		logger(fmt.Sprintf("Failed to ACK message : %s", err))
+	}
+
 }
 
 func main() {
